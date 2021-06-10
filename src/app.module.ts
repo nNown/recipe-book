@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RecipesModule } from './recipes/recipes.module';
 import { AuthModule } from './auth/auth.module';
+import { UsersService } from './users/users.service';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -13,7 +15,9 @@ import { AuthModule } from './auth/auth.module';
     //   connectionName: 'users'
     // }),
     RecipesModule,
-    AuthModule
+    AuthModule,
+    UsersModule
   ],
+  providers: [UsersService],
 })
 export class AppModule {}
