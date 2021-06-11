@@ -4,12 +4,15 @@ import { CreateRecipeDto } from './dto/create-recipe-dto';
 import { GetRecipesFilterDto } from './dto/get-recipes-filter-dto';
 import { RecipesService } from './recipes.service';
 import { Recipe } from '../schemas/recipe.schema';
+import { Roles } from 'src/roles/roles.decorator';
+import { Role } from 'src/roles/role.enum';
 
 @Controller('recipes')
 export class RecipesController {
     constructor(private readonly recipesService: RecipesService) {}
 
     @Get()
+    // @Roles(Role.Admin)
     async getAllRecipes(@Query() filterDto: GetRecipesFilterDto): Promise<Array<Recipe>> {
         return this.recipesService.getFilteredRecipes(filterDto);
         // if(Object.keys(filterDto).length) {

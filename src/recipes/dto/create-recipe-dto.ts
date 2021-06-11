@@ -1,4 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
+import { User } from 'src/schemas/user.schema';
 
 export class CreateRecipeDto {
     @IsNotEmpty()
@@ -8,7 +9,7 @@ export class CreateRecipeDto {
     description: string;
     
     @IsNotEmpty()
-    ingredients: Array<string>;
+    ingredients: string[];
     
     @IsNotEmpty()
     preparation: string;
@@ -17,8 +18,5 @@ export class CreateRecipeDto {
     image: string;
 
     @IsNotEmpty()
-    author: string;
-
-    @IsNotEmpty()
-    authorId: string;
+    author: User;
 }
