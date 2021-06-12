@@ -1,14 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from 'src/schemas/user.schema';
 import { CreateUserDto } from './dto/create-user-dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
     constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-    async getAllUsers(): Promise<Array<User>> {
+    async getAllUsers(): Promise<User[]> {
         return await this.userModel.find().exec();
     }
 
@@ -21,6 +22,23 @@ export class UsersService {
     }
 
     async createUser(createUserDto: CreateUserDto): Promise<User> {
-        return await new this.userModel(createUserDto).save();
+        const { username, password, role } = createUserDto;
+
+        const salt = await bcrypt.genSalt();
+        const hashedPassword = await bcrypt.hash(password, salt)
+
+        const user = new this.userModel({ username, password: hashedPassword, role });
+
+        try {
+            await user.save();
+        } catch(error) {
+            if(error.code === '23505') {
+                throw new ConflictException('Username already exists');
+            } else {
+                throw new InternalServerErrorException();
+            }
+        }
+
+        return user;
     }
 }

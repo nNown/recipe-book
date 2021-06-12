@@ -16,7 +16,4 @@ export class CreateRecipeDto {
 
     @IsNotEmpty()
     image: string;
-
-    @IsNotEmpty()
-    author: User;
 }

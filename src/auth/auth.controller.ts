@@ -1,27 +1,34 @@
-import { Controller, Request, Post, UseGuards, Get, Body } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards } from '@nestjs/common';
+import { Role } from 'src/roles/role.enum';
+import { Roles } from 'src/roles/roles.decorator';
+import { RolesGuard } from 'src/roles/roles.guard';
 import { User } from 'src/schemas/user.schema';
-import { CreateUserDto } from 'src/users/dto/create-user-dto';
 import { AuthService } from './auth.service';
+import { AuthCredentialsDto } from './dto/auth-credentials-dto';
+import { GetUser } from './get-user-decorator';
+import { JwtAuthGuard } from './jwt-auth-guard';
 import { Public } from './public.decorator';
 
 @Controller('auth')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
-    @Public()
-    @Post('/login')
-    async login(@Request() req) {
-        return this.authService.login(req.body);
-    }
-
-    @Get('/profile')
-    getProfile() {
+    @Get('/users')
+    @Roles(Role.Admin)
+    async getUsers(): Promise<User[]> {
         return this.authService.getUsers();
     }
 
+    @Post('/signin')
     @Public()
+    async signIn(@Body() authCredentialsDto: AuthCredentialsDto): Promise<{ accessToken: string }> {
+        return this.authService.signIn(authCredentialsDto);
+    }
+
     @Post('/signup')
-    async signup(@Body() createUserDto: CreateUserDto): Promise<User> {
-        return this.authService.signup(createUserDto);
+    @Public()
+    async signUp(@Body() authCredentialsDto: AuthCredentialsDto): Promise<User> {
+        return this.authService.signUp(authCredentialsDto);
     }
 }

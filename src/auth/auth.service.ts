@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/schemas/user.schema';
-import { CreateUserDto } from 'src/users/dto/create-user-dto';
 import { UsersService } from 'src/users/users.service';
+import * as bcrypt from 'bcrypt';
+import { JwtPayload } from './jwt-payload-interface';
+import { AuthCredentialsDto } from './dto/auth-credentials-dto';
 
 @Injectable()
 export class AuthService {
@@ -20,15 +22,22 @@ export class AuthService {
         return null;
     }
 
-    async login(user: any) {
-        const payload = { username: user.username, sub: user.userId };
-        return {
-            access_token: this.jwtService.sign(payload)
-        };
+    async signIn(authCredentialsDto: AuthCredentialsDto): Promise<{ accessToken: string }> {
+        const { username, password } = authCredentialsDto;
+        const user = await this.usersService.getUser(username);
+
+        if(user && (await bcrypt.compare(password, user.password))) {
+            const payload: JwtPayload = { username };
+            const accessToken: string = await this.jwtService.sign(payload);
+            
+            return { accessToken };
+        } else {
+            throw new UnauthorizedException('User credentials are incorrect');
+        }
     }
 
-    async signup(user: CreateUserDto): Promise<User> {
-        return await this.usersService.createUser(user);
+    async signUp(authCredentialsDto: AuthCredentialsDto): Promise<User> {
+        return await this.usersService.createUser(authCredentialsDto);
     }
 
     async getUsers(): Promise<User[]> {

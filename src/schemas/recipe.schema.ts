@@ -21,7 +21,7 @@ export class Recipe {
     @Prop()
     image: string;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name, required: true })
     author: User;
 }
 

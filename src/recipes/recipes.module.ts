@@ -1,15 +1,13 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
-import { JwtAuthGuard } from 'src/auth/jwt-auth-guard';
-import { RolesGuard } from 'src/roles/roles.guard';
+import { AuthModule } from 'src/auth/auth.module';
 import { Recipe, RecipeSchema } from '../schemas/recipe.schema';
 import { RecipesController } from './recipes.controller';
 import { RecipesService } from './recipes.service';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Recipe.name, schema: RecipeSchema, collection: Recipe.name }])],
+  imports: [MongooseModule.forFeature([{ name: Recipe.name, schema: RecipeSchema, collection: Recipe.name }]), AuthModule],
   controllers: [RecipesController],
-  providers: [RecipesService, /* { provide: APP_GUARD, useClass: JwtAuthGuard }, { provide: APP_GUARD, useClass: RolesGuard } */],
+  providers: [RecipesService],
 })
 export class RecipesModule {}
