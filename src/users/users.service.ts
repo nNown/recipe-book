@@ -32,11 +32,7 @@ export class UsersService {
         try {
             await user.save();
         } catch(error) {
-            if(error.code === '23505') {
-                throw new ConflictException('Username already exists');
-            } else {
-                throw new InternalServerErrorException();
-            }
+            throw new InternalServerErrorException();
         }
 
         return user;

@@ -10,18 +10,19 @@ import { User } from 'src/schemas/user.schema';
 export class RecipesService {
     constructor(@InjectModel(Recipe.name) private recipeModel: Model<RecipeDocument>) {}
 
-    async getAllRecipes(): Promise<Recipe[]> {
-        return await this.recipeModel.find().exec();
+    async getAllRecipes(filterDto: GetRecipesFilterDto): Promise<Recipe[]> {
+        const{ page, limit } = filterDto;
+        return await this.recipeModel.find().skip(page * limit).limit(limit).exec();
     }
 
     async getFilteredRecipes(filterDto: GetRecipesFilterDto, user: User): Promise<Recipe[]> {
-        const { keyword } = filterDto;
+        const { title, page, limit } = filterDto;
 
-        let recipes = await this.recipeModel.find({ author: user }).exec();
+        let recipes = await this.recipeModel.find({ author: user }).skip(page * limit).limit(limit).exec();
 
-        if(keyword) {
+        if(title) {
             recipes = recipes.filter(recipe => {
-                if(recipe.title.toLowerCase().includes(keyword) || recipe.description.toLowerCase().includes(keyword)) {
+                if(recipe.title.toLowerCase().includes(title)) {
                     return true;
                 }
                 return false;

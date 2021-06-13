@@ -8,22 +8,22 @@ import { GetUser } from 'src/auth/get-user-decorator';
 import { User } from 'src/schemas/user.schema';
 import { JwtAuthGuard } from 'src/auth/jwt-auth-guard';
 import { RolesGuard } from 'src/roles/roles.guard';
-import { Roles } from 'src/roles/roles.decorator';
 import { Role } from 'src/roles/role.enum';
+import { Roles } from 'src/roles/roles.decorator';
 
 @Controller('recipes')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class RecipesController {
     constructor(private readonly recipesService: RecipesService) {}
 
-    @Get()
+    @Get('/all')
     @Roles(Role.Admin)
-    async getAllRecipes() {
-        return this.recipesService.getAllRecipes();
+    async getAllRecipes(@Query() filterDto: GetRecipesFilterDto): Promise<Recipe[]> {
+        return this.recipesService.getAllRecipes(filterDto);
     }
 
-    @Get('/profile')
-    async getFilteredRecipes(@Query() filterDto: GetRecipesFilterDto, @GetUser() user: User): Promise<Array<Recipe>> {
+    @Get()
+    async getFilteredRecipes(@Query() filterDto: GetRecipesFilterDto, @GetUser() user: User): Promise<Recipe[]> {
         return this.recipesService.getFilteredRecipes(filterDto, user);
     }
 

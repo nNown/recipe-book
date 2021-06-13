@@ -15,8 +15,8 @@ export class Recipe {
     @Prop([String])
     ingredients: string[];
 
-    @Prop()
-    preparation: string;
+    @Prop([String])
+    preparation: string[];
 
     @Prop()
     image: string;
