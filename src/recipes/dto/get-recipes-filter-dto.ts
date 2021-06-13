@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsOptional, IsString, Min } from "class-validator";
 import { Type } from "class-transformer";
 
 export class GetRecipesFilterDto {
@@ -7,8 +7,10 @@ export class GetRecipesFilterDto {
     title?: string;
 
     @Type(() => Number)
+    @Min(0)
     page: number;
 
     @Type(() => Number)
+    @Min(1)
     limit: number;
 }
